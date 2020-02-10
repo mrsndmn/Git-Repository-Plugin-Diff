@@ -42,7 +42,6 @@ sub diff {
 
         if ( $line =~ /^@@/ ) {
             push @hunks, $hunk if $hunk;
-            warn "# parsing header: $line";
             $hunk = Git::Repository::Plugin::Diff::Hunk->parse_header($line);
             next;
         }
