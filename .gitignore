@@ -7,3 +7,4 @@ MYMETA.*
 /.prove
 .vstags
 local/
+.test.requires.git.lock

@@ -14,9 +14,9 @@ use Carp qw/croak/;
 use Git::Repository::Plugin::Diff::Hunk;
 use Git::Repository::Plugin::Diff::File;
 
-sub _keywords {
+sub _keywords {    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     return qw( diff );
-}    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+}
 
 sub diff {
     my ( $repository, $file, $from_commit, $to_commit ) = @_;
@@ -31,18 +31,21 @@ sub diff {
     my $diff_file = Git::Repository::Plugin::Diff::File->new();
 
     # Parse the output.
-    while ( my $hunk_header = shift @output ) {
-        my $hunk =
-          Git::Repository::Plugin::Diff::Hunk->parse_header($hunk_header);
-
-        while ( !$hunk->is_finished ) {
-            my $line = shift @output;
-            if ( !defined $line ) {
-                croak();
-            }
+    my $hunk;
+    while (1) {
+        my $line = shift @output;
+        if ( !defined $line ) {    # eof
+            $diff_file->add_hunk($hunk) if $hunk;
+            last;
         }
 
-        $diff_file->add_hunk($hunk);
+        if ( $line =~ /^@@/ ) {
+            $diff_file->add_hunk($hunk) if $hunk;
+            $hunk = Git::Repository::Plugin::Diff::Hunk->parse_header($line);
+            next;
+        }
+
+        $hunk->add_line($line);
     }
 
     return $diff_file;
