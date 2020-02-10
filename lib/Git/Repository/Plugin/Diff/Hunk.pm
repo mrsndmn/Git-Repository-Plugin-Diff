@@ -58,6 +58,26 @@ sub parse_header {
     );
 }
 
+sub to_line_start {
+    my ($self) = @_;
+    return $self->{to_line_start};
+}
+
+sub to_line_count {
+    my ($self) = @_;
+    return $self->{to_line_count};
+}
+
+sub from_line_start {
+    my ($self) = @_;
+    return $self->{from_line_start};
+}
+
+sub from_line_count {
+    my ($self) = @_;
+    return $self->{from_line_count};
+}
+
 sub _parse_hunk_numbers {
     my ( $pkg, $numbers_str ) = @_;
     my ( $line_start, $line_count ) = split ',', $numbers_str;
@@ -128,3 +148,76 @@ sub to_lines {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Git::Repository::Plugin::Diff::Hunk - object that contains diff lines.
+L<About diff format|https://www.gnu.org/software/diffutils/manual/html_node/Detailed-Unified.html#Detailed-Unified>
+
+=head1 SYNOPSIS
+
+    # Load the plugin.
+    use Git::Repository 'Diff';
+
+    my $repository = Git::Repository->new();
+
+    # Get the git diff information.
+    my $file_diff = $repository->diff( $file, "HEAD", "HEAD~1" );
+    my $other_file_diff = $repository->diff( $file, "HEAD", "origin/master" );
+
+    my @hunks = $file_diff->get_hunks;
+
+    my $first_hunk = shift @hunks;
+    _dump_diff($first_hunk);
+
+    sub _dump_diff {
+        my ($hunk) = @_;
+        for my $l ($first_hunk->to_lines) {
+            my ($line_num, $line_content) = @$l;
+            print("+ $line_num: $line_content\n")
+        }
+        for my $l ($first_hunk->from_lines) {
+            my ($line_num, $line_content) = @$l;
+            print("- $line_num: $line_content\n")
+        }
+    }
+
+=head1 DESCRIPTION
+
+
+=head2 from_lines
+=head2 to_lines
+
+Returns a list of arrays for each line for to/from file diff.
+The first array element is line number. The second is line content.
+
+=head2 to_line_start
+=head2 from_line_start
+
+The first number in hunk header
+
+=head2 from_line_count
+=head2 to_line_count
+
+The second number in hunk header
+
+=head1 AUTHOR
+
+d.tarasov E<lt>d.tarasov@corp.mail.ruE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2020- d.tarasov
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=cut

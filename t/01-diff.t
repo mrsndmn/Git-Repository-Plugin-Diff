@@ -41,24 +41,20 @@ close($fh);
 
 my ($log) = $r->log('-1');
 
-my $file_diff;
+my @hunks;
 lives_ok(
     sub {
-        $file_diff = $r->diff( $test_file, 'HEAD', 'HEAD~1' );
-        use Data::Dumper;
-        diag( Dumper($file_diff) );
+        @hunks = $r->diff( $test_file, 'HEAD', 'HEAD~1' );
     },
     'Git repo get diff'
 );
-
-my @hunks = $file_diff->get_hunks;
 
 cmp_ok( scalar @hunks, '==', 2 );
 
 my ( $first_hunk, $second_hunk ) = @hunks;
 
 for my $line_kind (qw{from_lines to_lines}) {
-    for my $l ( @{ $first_hunk->{$line_kind} } ) {
+    for my $l ( $first_hunk->$line_kind ) {
         my ( $line_num, $line_content ) = @$l;
 
         if ( ( $line_kind eq 'from_lines' ) && ( $line_num == 1 ) ) {
@@ -72,7 +68,7 @@ for my $line_kind (qw{from_lines to_lines}) {
 }
 
 for my $line_kind (qw{from_lines to_lines}) {
-    for my $l ( @{ $second_hunk->{$line_kind} } ) {
+    for my $l ( $second_hunk->$line_kind ) {
         my ( $line_num, $line_content ) = @$l;
         cmp_ok( $line_num, '==', $line_content, 'Hunk line count is ok' );
     }
