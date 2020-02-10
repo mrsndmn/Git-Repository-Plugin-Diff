@@ -24,22 +24,25 @@ sub diff {
       $repository->command( 'diff', $from_commit, $to_commit, $file );
     my @output = $command->final_output();
 
-    # remove diff header - we cant get any usefull information from it
-    splice @output, 0, 4;
-
     my @hunks;
 
     # Parse the output.
     my $hunk;
     while (1) {
         my $line = shift @output;
+
         if ( !defined $line ) {    # eof
             push @hunks, $hunk if $hunk;
             last;
         }
 
+        if ( !defined($hunk) and $line !~ /^\@\@/ ) {
+            next;
+        }
+
         if ( $line =~ /^@@/ ) {
             push @hunks, $hunk if $hunk;
+            warn "# parsing header: $line";
             $hunk = Git::Repository::Plugin::Diff::Hunk->parse_header($line);
             next;
         }

@@ -39,7 +39,10 @@ sub parse_header {
     my ( $pkg, $str ) = @_;
 
     my ( $from_file_line_numbers, $to_file_line_numbers ) =
-      $str =~ /^\@\@ \s \-(\S+) \s \+(\S+) \s \@\@$/x;
+      $str =~ /^\@\@ \s \-(\S+) \s \+(\S+) \s \@\@/x;
+
+    croak "Cant parse hunk header: $str"
+      if !defined $from_file_line_numbers || !defined $to_file_line_numbers;
 
     my ( $from_line_start, $from_line_count ) =
       $pkg->_parse_hunk_numbers($from_file_line_numbers);

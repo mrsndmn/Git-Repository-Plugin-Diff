@@ -50,7 +50,7 @@
          }
       }
    },
-   "release_status" : "stable",
+   "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/mrsndmn/Git-Repository-Plugin-Diff/issues"
