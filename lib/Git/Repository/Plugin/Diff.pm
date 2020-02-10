@@ -12,11 +12,10 @@ our @ISA = qw( Git::Repository::Plugin );
 use Carp qw/croak/;
 
 use Git::Repository::Plugin::Diff::Hunk;
-use Git::Repository::Plugin::Diff::File;
 
-sub _keywords {
+sub _keywords {    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     return qw( diff );
-}    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+}
 
 sub diff {
     my ( $repository, $file, $from_commit, $to_commit ) = @_;
@@ -28,24 +27,27 @@ sub diff {
     # remove diff header - we cant get any usefull information from it
     splice @output, 0, 4;
 
-    my $diff_file = Git::Repository::Plugin::Diff::File->new();
+    my @hunks;
 
     # Parse the output.
-    while ( my $hunk_header = shift @output ) {
-        my $hunk =
-          Git::Repository::Plugin::Diff::Hunk->parse_header($hunk_header);
-
-        while ( !$hunk->is_finished ) {
-            my $line = shift @output;
-            if ( !defined $line ) {
-                croak();
-            }
+    my $hunk;
+    while (1) {
+        my $line = shift @output;
+        if ( !defined $line ) {    # eof
+            push @hunks, $hunk if $hunk;
+            last;
         }
 
-        $diff_file->add_hunk($hunk);
+        if ( $line =~ /^@@/ ) {
+            push @hunks, $hunk if $hunk;
+            $hunk = Git::Repository::Plugin::Diff::Hunk->parse_header($line);
+            next;
+        }
+
+        $hunk->add_line($line);
     }
 
-    return $diff_file;
+    return @hunks;
 }
 
 1;
@@ -65,12 +67,34 @@ Git::Repository::Plugin::Diff - Add diff method to L<Git::Repository>.
     my $repository = Git::Repository->new();
 
     # Get the git diff information.
-    my $blame_lines = $repository->diff( $file, "HEAD", "origin/master" );
+    my @hunks = $repository->diff( $file, "HEAD", "HEAD~1" );
+    my @other_hunks = $repository->diff( $file, "HEAD", "origin/master" );
+
+    my $first_hunk = shift @hunks;
+    _dump_diff($first_hunk);
+
+    sub _dump_diff {
+        my ($hunk) = @_;
+        for my $l ($first_hunk->to_lines) {
+            my ($line_num, $line_content) = @$l;
+            print("+ $line_num: $line_content\n")
+        }
+        for my $l ($first_hunk->from_lines) {
+            my ($line_num, $line_content) = @$l;
+            print("- $line_num: $line_content\n")
+        }
+    }
 
 =head1 DESCRIPTION
 
 Git::Repository::Plugin::Diff adds diff method to L<Git::Repository>, which can be
 used to determine diff between two commits/branches etc
+
+=head2 diff()
+
+Returns list of hunks diff for specified file. For specified commits (or branches).
+
+    my @hunks = $repository->diff( $file, "HEAD", "HEAD~1" );
 
 =head1 AUTHOR
 
