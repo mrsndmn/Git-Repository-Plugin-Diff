@@ -74,4 +74,13 @@ for my $line_kind (qw{from_lines to_lines}) {
     }
 }
 
+lives_ok(
+    sub {
+        @hunks = $r->diff( $test_file, 'HEAD', 'HEAD' );
+    },
+    'Git repo get no diff'
+);
+
+cmp_ok( scalar @hunks, '==', 0, 'No diff ok' );
+
 done_testing();
