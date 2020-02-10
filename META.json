@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "Add diff method to L<Git::Repository>.",
    "author" : [
       "d.tarasov <d.tarasov@corp.mail.ru>"
    ],
@@ -37,17 +37,35 @@
       },
       "runtime" : {
          "requires" : {
+            "Git::Repository::Plugin" : "1",
             "perl" : "5.008005"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.96"
+            "Git::Repository::Plugin::Log" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.96",
+            "Test::Requires::Git" : "1"
          }
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrsndmn/Git-Repository-Plugin-Diff/issues"
+      },
+      "homepage" : "https://github.com/mrsndmn/Git-Repository-Plugin-Diff",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mrsndmn/Git-Repository-Plugin-Diff.git",
+         "web" : "https://github.com/mrsndmn/Git-Repository-Plugin-Diff"
+      }
+   },
    "version" : "0.01",
+   "x_contributors" : [
+      "MrSndmn <15786586+mrsndmn@users.noreply.github.com>"
+   ],
    "x_generated_by_perl" : "v5.28.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_static_install" : 1
