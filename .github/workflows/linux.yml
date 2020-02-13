@@ -31,7 +31,7 @@ jobs:
         run: perl -V
       - name: Install Dependencies
         run: curl -sL https://git.io/cpm | perl - install -g --show-build-log-on-failure
-      -name: Git config setup
+      - name: Git config setup
         run:   git config --global user.email "git-repository-plugin-diff@example.com" && git config --global user.name "Git-Repository-Plugin-Diff Test"
       - name: Run Tests
         run: prove -l t
