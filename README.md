@@ -1,6 +1,6 @@
 # NAME
 
-Git::Repository::Plugin::Diff - Add diff method to [Git::Repository](https://metacpan.org/pod/Git%3A%3ARepository).
+[Git::Repository::Plugin::Diff](https://metacpan.org/pod/Git::Repository::Plugin::Diff) - Add diff method to [Git::Repository](https://metacpan.org/pod/Git%3A%3ARepository).
 
 # SYNOPSIS
 
